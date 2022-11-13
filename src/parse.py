@@ -40,6 +40,24 @@ class MyHTMLParser(HTMLParser):
                     card_parsed = card_name.split("-")
                     if card_parsed[0] == "alolan":
                         parsed_name = card_parsed[1]
+                    elif card_parsed[0] == "m":
+                        parsed_name = card_parsed[1]
+                    elif card_parsed[0] == "dawn":
+                        parsed_name = card_parsed[1]
+                    elif card_parsed[0] == "dark":
+                        parsed_name = card_parsed[1]
+                    elif card_parsed[0] == "shining":
+                        parsed_name = card_parsed[1]
+                    elif card_parsed[0] == "shadow":
+                        parsed_name = card_parsed[1]
+                    elif card_parsed[0] == "primal":
+                        parsed_name = card_parsed[1]
+                    elif card_parsed[0] == "ultra":
+                        parsed_name = card_parsed[1]
+                    elif card_parsed[0] == "heat":
+                        parsed_name = card_parsed[1]
+                    elif card_parsed[0] == "wash":
+                        parsed_name = card_parsed[1]
                     else:
                         parsed_name = card_parsed[0]
                     card_name = parsed_name
@@ -55,23 +73,27 @@ def str2bool(v):
 
 def main(argv):
     all_cards = {}
-    # <a class="card-price usd" href="https://store.tcgplayer.com/pokemon/sm-crimson-invasion/aggron?utm_campaign=affiliate&utm_medium=LimitlessTCG&utm_source=LimitlessTCG" target="_blank">$0.37</a>
-    parser = MyHTMLParser()
-    page_uri = "https://limitlesstcg.com/cards?q=type%3Apokemon+lang%3Aen+display%3Alist+sort%3Aname+unique%3Acards&page={0}".format(
-        1)
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36'}
-    r = requests.Session()
-    response = r.get(page_uri, headers=headers)
-    body = response.content.decode()
-    parser.feed(body)
-    for name in parser.cards:
-        set_name = parser.cards[name].CardSet
-        price = parser.cards[name].Price
-        if name not in all_cards:
-            all_cards[name] = PokemonCard(set_name,price)
-        if price < all_cards[name].Price:
-            all_cards[name] = PokemonCard(set_name, price)
-    print(all_cards)
+    for page in range(1, 136):
+
+        # <a class="card-price usd" href="https://store.tcgplayer.com/pokemon/sm-crimson-invasion/aggron?utm_campaign=affiliate&utm_medium=LimitlessTCG&utm_source=LimitlessTCG" target="_blank">$0.37</a>
+        parser = MyHTMLParser()
+        page_uri = "https://limitlesstcg.com/cards?q=type%3Apokemon+lang%3Aen+display%3Alist+sort%3Aname+unique%3Acards&page={0}".format(
+            page)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36'}
+        r = requests.Session()
+        response = r.get(page_uri, headers=headers)
+        body = response.content.decode()
+        parser.feed(body)
+        for name in parser.cards:
+            set_name = parser.cards[name].CardSet
+            price = parser.cards[name].Price
+            if name not in all_cards:
+                all_cards[name] = PokemonCard(set_name,price)
+            if price < all_cards[name].Price:
+                all_cards[name] = PokemonCard(set_name, price)
+        print("Done page {0}".format(page))
+    for card in all_cards:
+        print(card + "," + all_cards[card].CardSet + "," + all_cards[card].Price)
 if __name__ == "__main__":
     main(sys.argv[1:])
